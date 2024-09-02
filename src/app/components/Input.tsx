@@ -4,8 +4,7 @@ type IProps = {
     name: string,
     defaultValue?: string,
     title: string,
-    inputProps?: InputHTMLAttributes<HTMLInputElement>
-}
+} & InputHTMLAttributes<HTMLInputElement>
 export default function Input(prop: IProps) {
     const {title, defaultValue, name, ...inputProps } = prop
     return (

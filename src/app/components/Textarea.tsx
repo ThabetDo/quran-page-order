@@ -4,10 +4,10 @@ type IProps = {
     name: string,
     defaultValue?: string,
     title: string,
-    inputProps?: InputHTMLAttributes<HTMLTextAreaElement>
-}
+} & InputHTMLAttributes<HTMLTextAreaElement>
+
 export default function Textarea(prop: IProps) {
-    const {title, defaultValue, name,...inputProps} = prop
+    const {title, defaultValue, name, ...inputProps} = prop
     return (
         <div className="relative w-full min-w-[200px]">
             <textarea

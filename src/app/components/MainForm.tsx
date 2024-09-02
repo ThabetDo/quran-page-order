@@ -6,8 +6,9 @@ import {getFlattenedNameList, getNameList, getPageOrderByName, wordToNumber} fro
 import IconBtn from "@/app/components/IconBtn";
 
 export default function MainForm() {
-    const [zkr, setZkr] = useState<string>(localStorage.getItem('zkr') || 'سبحان الله وبحمده، عدد خلقه، ورضا نفسه، وزنة عرشه، ومداد كلماته عشر مرات ❤');
-    const [names, setNames] = useState<string>(localStorage.getItem('names') || `{
+    const getLocalStorage = (name: string) => typeof window !== "undefined" ? localStorage.getItem(name) : ''
+    const [zkr, setZkr] = useState<string>(getLocalStorage('zkr') || 'سبحان الله وبحمده، عدد خلقه، ورضا نفسه، وزنة عرشه، ومداد كلماته عشر مرات ❤');
+    const [names, setNames] = useState<string>(getLocalStorage('names') || `{
     "1": [
         "أبو انس",
         "أبو خالد خاروف",
@@ -49,9 +50,9 @@ export default function MainForm() {
         "أحمد دحبور"
     ]
 }`);
-    const [duaa, setDuaa] = useState<string>(localStorage.getItem('duaa') || 'للهم اجعلنا مدبرين مقبلين الى دوام ذكرك وشكرك وحسن عبادك ولا تجعلنا من المعرضين');
-    const [startPage, setStartPage] = useState<number>(parseInt(localStorage.getItem('startPage') || '302', 10));
-    const [recitationNumber, setRecitationNumber] = useState<string>(localStorage.getItem('recitationNumber') || '20');
+    const [duaa, setDuaa] = useState<string>(getLocalStorage('duaa') || 'للهم اجعلنا مدبرين مقبلين الى دوام ذكرك وشكرك وحسن عبادك ولا تجعلنا من المعرضين');
+    const [startPage, setStartPage] = useState<number>(parseInt(getLocalStorage('startPage') || '302', 10));
+    const [recitationNumber, setRecitationNumber] = useState<string>(getLocalStorage('recitationNumber') || '20');
 
     const nameList = getNameList(names);
 
@@ -65,8 +66,8 @@ export default function MainForm() {
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = e.target;
-        localStorage.setItem(name, value); // Save to localStorage whenever an input changes
-        console.log({name, value})
+        if (typeof window !== "undefined")
+            localStorage.setItem(name, value); // Save to localStorage whenever an input changes
         switch (name) {
             case 'zkr':
                 setZkr(value);
