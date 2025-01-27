@@ -1,4 +1,5 @@
-type INameListObject = { [key: number]: string[] }
+import {IName, INameListObject} from "@/app/types";
+
 export const wordToNumber = (n: number) => {
     const list: { [key: number]: string } = {
         1: "الأولى",
@@ -67,3 +68,72 @@ export const getPageOrderByName: (startCount: number, nameList: INameListObject)
     }
     return result
 }
+/**
+ * Converts an array of IName objects into an INameListObject.
+ * @param nameArray Array of objects with {name, count}.
+ * @returns Grouped INameListObject.
+ */
+export const nameArrayToNameListObject = (nameArray: IName[]): INameListObject => {
+    const grouped: INameListObject = {};
+
+    nameArray.forEach((item) => {
+        // Calculate group key based on group size
+        const groupKey = item.count;
+
+        if (!grouped[groupKey]) {
+            grouped[groupKey] = [];
+        }
+
+        grouped[groupKey].push(item.name);
+    });
+
+    return grouped;
+};
+/**
+ * Converts a JSON string (or comma-separated list) into IName[]
+ * @param str Input string containing names
+ * @returns Parsed array of IName
+ */
+export const stringToNameArray = (str: string | null): IName[] => {
+    if (!str) return [];
+    try {
+        // First, attempt to parse directly if it's JSON
+        const parsed = JSON.parse(str);
+        if (Array.isArray(parsed)) {
+            // If already an array, confirm it matches IName[]
+            return parsed.map(item => ({
+                name: item.name || item,
+                count: item.count || 1,
+            }));
+        } else if (typeof parsed === "object") {
+            // Handle a structured object like the sample in "names"
+            const names: IName[] = [];
+            Object.values(parsed).forEach((group: any) => {
+                if (Array.isArray(group)) {
+                    group.forEach((name: string) => {
+                        names.push({name, count: 1});
+                    });
+                }
+            });
+            return names;
+        }
+    } catch (error) {
+        // Handle comma-separated list fallback
+        const tempNames = str.split(",").map(name => name.trim());
+        return tempNames.map(name => ({name, count: 1}));
+    }
+    return [];
+};
+
+/**
+ * Converts an IName[] array into a string representation
+ * @param nameArray Array of IName
+ * @returns Stringified format of the array
+ */
+export const nameArrayToString = (nameArray: IName[]): string => {
+    // If you want JSON output
+    return JSON.stringify(nameArray);
+
+    // Or customize it into a displayable text (comma-separated)
+    // return nameArray.map(item => item.name).join(", ");
+};
