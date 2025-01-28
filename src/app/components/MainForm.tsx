@@ -185,7 +185,7 @@ ${duaa}`;
                     type='number'
                     max={60}
                     min={1}
-                    defaultValue={startPage as unknown as string}
+                    defaultValue={part as unknown as string}
                     onChange={handleInputChange}
                 />
             </div>
