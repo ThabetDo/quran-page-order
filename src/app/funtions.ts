@@ -37,6 +37,7 @@ export const wordToNumber = (n: number) => {
     };
     return list[n]
 }
+
 export const getNameList: (nameList: String) => INameListObject = (nameList) => {
     let namesInStringJSON = nameList
         .replaceAll('\'', '"')
@@ -44,21 +45,25 @@ export const getNameList: (nameList: String) => INameListObject = (nameList) => 
         .replace(/(\d+):/g, '"$1":');
     return JSON.parse(namesInStringJSON) as INameListObject
 }
+
 export const getFlattenedNameList: (obj: INameListObject) => string[] = (nameList) => Object.values(nameList).flat()
+
 const nameMaxLength: (nameList: INameListObject) => number = (nameList) => getFlattenedNameList(nameList).reduce((p, c) => {
     return c.length > p ? c.length : p
 }, 0)
-export const getPageOrderByName: (startCount: number, nameList: INameListObject) => String = (startCount, nameList) => {
+
+export const getPageOrderByName: (startCount: number, nameList: INameListObject, limit: number) => String = (startCount, nameList, limit) => {
     const pageLimit: number = 604
     let result = ''
-
+    let limitCount = limit
     for (let nameListKey in nameList) {
         const pagesCount: number = parseInt(nameListKey)
         nameList[nameListKey].forEach(name => {
             let pages = ''
             for (let i = 0; i < pagesCount; i++) {
-                if (startCount > pageLimit) break;
+                if (startCount > pageLimit || limitCount < 1) break;
                 pages = pages ? `${pages}-${startCount}` : `${startCount}`
+                limitCount--
                 startCount++
             }
             if (startCount > pageLimit) return;
@@ -68,6 +73,7 @@ export const getPageOrderByName: (startCount: number, nameList: INameListObject)
     }
     return result
 }
+
 /**
  * Converts an array of IName objects into an INameListObject.
  * @param nameArray Array of objects with {name, count}.
@@ -89,6 +95,7 @@ export const nameArrayToNameListObject = (nameArray: IName[]): INameListObject =
 
     return grouped;
 };
+
 /**
  * Converts a JSON string (or comma-separated list) into IName[]
  * @param str Input string containing names

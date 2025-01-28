@@ -63,16 +63,23 @@ export default function MainForm() {
 // }`);
     const [names2, setNames2] = useState<IName[]>(stringToNameArray(getLocalStorage('names2')));
     const [duaa, setDuaa] = useState<string>(getLocalStorage('duaa') || 'للهم اجعلنا مدبرين مقبلين الى دوام ذكرك وشكرك وحسن عبادك ولا تجعلنا من المعرضين');
+    const [part, setPart] = useState<number>(parseInt(getLocalStorage('part') || '2', 2));
     const [startPage, setStartPage] = useState<number>(parseInt(getLocalStorage('startPage') || '302', 10));
     const [recitationNumber, setRecitationNumber] = useState<string>(getLocalStorage('recitationNumber') || '20');
 
+    const limitCount = parseInt(String(part ?? '1')) * 20;
     const name2List = nameArrayToNameListObject(names2);
     const partNumber = () => {
         const startPart = Math.ceil(startPage / 20);
-        const endPart = Math.ceil((startPage + getFlattenedNameList(name2List).length) / 20);
+        const limit = startPage + limitCount;//TODO apply the limit (fix it)
+        let endPage = getFlattenedNameList(name2List).length;
+        if (limit > endPage) {
+            endPage = limit;
+        }
+        const endPart = Math.ceil((startPart + endPage) / 20);
         return startPart === endPart
             ? `${wordToNumber(startPart)}`
-            : `${wordToNumber(startPart)} ~ ${wordToNumber(endPart)}`;
+            : `${wordToNumber(startPart)} - ${wordToNumber(endPart)}`;
     };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -120,6 +127,9 @@ export default function MainForm() {
             case 'startPage':
                 setStartPage(Number(value));
                 break;
+            case 'part':
+                setPart(Number(value));
+                break;
             case 'recitationNumber':
                 setRecitationNumber(value);
                 break;
@@ -132,7 +142,7 @@ export default function MainForm() {
 الختمة { ${recitationNumber} }
 توزيع الجزء ${partNumber()}
 رقم الصفحة   اخي بالله
-${getPageOrderByName(startPage, name2List)}
+${getPageOrderByName(startPage, name2List, limitCount)}
 ${duaa}`;
 
     const copyResult = () => {
@@ -165,6 +175,17 @@ ${duaa}`;
                     max={604}
                     min={0}
                     defaultValue={startPage.toString()}
+                    onChange={handleInputChange}
+                />
+            </div>
+            <div className='m-5'>
+                <Input
+                    name='part'
+                    title='عدد الاجزاء'
+                    type='number'
+                    max={60}
+                    min={1}
+                    defaultValue={startPage as unknown as string}
                     onChange={handleInputChange}
                 />
             </div>
@@ -213,7 +234,7 @@ ${duaa}`;
                 <AddBtn onClick={() => setNames2(old => {
                     const updatedNames = [
                         ...old,
-                        {name: '', count: 1} // Add a new name with default values
+                        {name: ' ', count: 1} // Add a new name with default values
                     ];
                     if (isBrowser)
                         localStorage.setItem('names2', nameArrayToString(updatedNames)); // Save the updated list to localStorage
